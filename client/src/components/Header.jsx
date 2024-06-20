@@ -2,11 +2,33 @@ import React from 'react'
 import {useState} from 'react'
 import {Box, AppBar, Toolbar, Button, Typography, Tabs, Tab} from '@mui/material'
 import { Link } from 'react-router-dom'
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
+import { authActions } from '../redux/store'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast';
 
 const Header = () => {
-  const isLogin= useSelector((state)=> state.isLogin);
+  //global state.
+  let isLogin= useSelector((state)=> state.isLogin);
+  isLogin= isLogin || localStorage.getItem("userId");
+  const dispatch= useDispatch();
+  const navigate= useNavigate();
+
+  // state.
   const [value, setValue]= useState();
+
+  //logout function 
+  const handleLogout= ()=>{
+    try{
+      dispatch(authActions.logout());
+      toast.success("Logout Successfully");
+      navigate('/login');
+      localStorage.clear();
+    } catch(err){
+      console.log(err);
+    }
+  }
+
   return (
     <>
         <AppBar position='sticky'>
@@ -32,7 +54,7 @@ const Header = () => {
                     )}
                      
                     {isLogin && (
-                      <Button sx={{margin:1, color:'white'}} LinkComponent={Link} to="/logout" >Logout</Button>
+                      <Button sx={{margin:1, color:'white'}} onClick={handleLogout}>Logout</Button>
                     )}
                 </Box>
             </Toolbar>

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Box, Typography, TextField, Button} from '@mui/material'
+import {Box, Typography, TextField, Button, colors} from '@mui/material'
 import {useNavigate} from 'react-router-dom'
 import {useState, useEffect} from 'react'
 import axios from 'axios'
@@ -31,17 +31,25 @@ const Register = () => {
          e.preventDefault();
          setFormErrors(validate(inputs));
          setIsSubmit(true);
-         try{
-           const {data}= await axios.post('http://localhost:8080/api/v1/user/register',{username:inputs.name, email:inputs.email, password:inputs.password});
-           console.log(data);
-           if(data.success){
-             toast.success('user Register Successfully');
-             navigate('/login');
-           }
-         }catch(error){
-           console.log(error);
-         }
-       };
+         if(Object.keys(formErrors).length === 0 && isSubmit){
+          try{
+            const {user}= await axios.post(`http://localhost:8080/api/v1/user/single-user/${inputs.email}`);
+            if(user){
+              toast.success("user already existed");
+            } else {
+              const {data}= await axios.post('http://localhost:8080/api/v1/user/register',{username:inputs.name, email:inputs.email, password:inputs.password});
+              console.log(data);
+              if(data.success){
+                toast.success('user Register Successfully');
+                navigate('/login');
+              }
+            }  
+          }catch(error){
+            console.log(error);
+          }
+        }
+      }
+
 
        useEffect( ()=> {
             console.log(formErrors);
@@ -53,19 +61,19 @@ const Register = () => {
        // validate form value function.
        const validate= (values)=> {
             const errors= {};
-            const regex= /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+            const regex= /^[^\s@]+@[^\s@]+\.[^\s@]{2,3}$/i;
             if(!values.name){
-                errors.name= "Name is required";
+                errors.name= "* Name is required";
             }
             if(!values.email){
-                errors.email= "Email is required";
+                errors.email= "* Email is required";
             } else if(!regex.test(values.email)){
-                errors.email= "Invalid Email Format";
+                errors.email= "* Invalid Email Format";
             }
             if(!values.password){
-                errors.password= "Password is required";
-            } else if(values.password < 8){
-                errors.password= "Minimum length of Password is 8 characters";
+                errors.password= "* Password is required";
+            } else if(values.password.length < 8){
+                errors.password= "* Atleast 8 characters are Required";
             }
             return errors;
        };
@@ -91,7 +99,7 @@ const Register = () => {
                sx={{textTransform:"uppercase"}} 
                padding={3} 
                textAlign="center"
-             > Register</Typography>
+             > Regis</Typography>
    
              <TextField 
                type={'text'} 
@@ -100,8 +108,8 @@ const Register = () => {
                value={inputs.name} 
                onChange={handleChange} 
                margin='normal' 
-               required/>
-             <p>{formErrors.name}</p>   
+               />
+             <p style={{color:"red"}}> {formErrors.name} </p>   
 
              <TextField 
                type={'email'} 
@@ -110,8 +118,8 @@ const Register = () => {
                value={inputs.email} 
                onChange={handleChange} 
                margin='normal' 
-               required/>
-             <p>{formErrors.email}</p>
+               />
+             <p style={{color:"red"}}>{formErrors.email}</p>
    
              <TextField 
                type={"password"} 
@@ -120,8 +128,8 @@ const Register = () => {
                value={inputs.password} 
                onChange={handleChange} 
                margin="normal" 
-               required/>
-             <p>{formErrors.password}</p>
+               />
+             <p style={{color:"red"}}>{formErrors.password}</p>
    
              <Button 
                type="submit" 

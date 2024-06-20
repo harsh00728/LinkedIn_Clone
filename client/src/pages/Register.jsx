@@ -38,12 +38,13 @@ const Register = () => {
             if(data.success){
               toast.success('user Register Successfully');
               navigate('/login');
-            }
+            }  
           }catch(error){
             console.log(error);
           }
-         }
-       };
+        }
+      }
+
 
        useEffect( ()=> {
             console.log(formErrors);

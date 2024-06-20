@@ -103,3 +103,30 @@ exports.loginController= async (req, res)=> {
         })
     }
 };
+
+// get Single User.
+exports.singleUserController= async (req, res)=> {
+    const {email}= req.params;
+    try{
+        const user= await userModel.findOne({email});
+        if(!user){
+            return res.status(404).send({
+                success: false,
+                message: 'User not found with this id',
+                user
+            });
+        }
+        return res.status(200).send({
+            success: true,
+            message: "Get Single User data",
+            user,
+        })
+    } catch(err){
+        console.log(err);
+        return res.status(500).send({
+            success: false,
+            message: "error in Get Single User",
+            err
+        })
+    }
+};
